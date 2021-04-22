@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -37,7 +38,7 @@ func createreverseindex(dir string) {
 			ss[wl[i]] = mapitem
 		}
 	}
-	fmt.Println(toJson(ss))
+	wf("output.txt", toJson(ss)[1:len(toJson(ss))-1])
 }
 
 func cleantext(s string) string {
@@ -60,4 +61,18 @@ func toJson(searchlist map[string][]string) string {
 	output = strings.ReplaceAll(output, "],", "},\n")
 	output = strings.ReplaceAll(output, "]", "}")
 	return output
+}
+
+func wf(filename string, data string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, data)
+	if err != nil {
+		return err
+	}
+	return file.Sync()
 }
