@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -27,13 +29,35 @@ func createreverseindex(dir string) {
 			log.Fatal(err)
 		}
 
-		wl := strings.Split(string(content), " ")
+		wl := strings.Split(cleantext(string(content)), " ")
 
 		for i := range wl {
-			arr := ss[wl[i]]
-			arr = append(arr, fn)
-			ss[wl[i]] = arr
+			mapitem := ss[wl[i]]
+			mapitem = append(mapitem, fn)
+			ss[wl[i]] = mapitem
 		}
 	}
-	fmt.Println(ss)
+	fmt.Println(toJson(ss))
+}
+
+func cleantext(s string) string {
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pS := reg.ReplaceAllString(s, " ")
+
+	return pS
+}
+
+func toJson(searchlist map[string][]string) string {
+	j, err := json.Marshal(searchlist)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	}
+
+	output := strings.ReplaceAll(string(j), "[", "{")
+	output = strings.ReplaceAll(output, "],", "},\n")
+	output = strings.ReplaceAll(output, "]", "}")
+	return output
 }
