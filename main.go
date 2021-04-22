@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 }
 
 func createreverseindex(dir string) {
-	//ss := make(map[string][]string)
+	ss := make(map[string][]string)
 
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -20,11 +21,19 @@ func createreverseindex(dir string) {
 	}
 
 	for _, file := range files {
-		content, err := ioutil.ReadFile(dir + string(os.PathSeparator) + file.Name())
+		fn := file.Name()
+		content, err := ioutil.ReadFile(dir + string(os.PathSeparator) + fn)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("%s contents: %s\n", file.Name(), content)
+		wl := strings.Split(string(content), " ")
+
+		for i := range wl {
+			arr := ss[wl[i]]
+			arr = append(arr, fn)
+			ss[wl[i]] = arr
+		}
 	}
+	fmt.Println(ss)
 }
