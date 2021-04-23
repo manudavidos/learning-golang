@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	//createreverseindex("files")
-	sfi("output.txt", "vestibulum")
+	createreverseindex("files")
+	sfi("output.txt", "hello hello")
 }
 
 func createreverseindex(dir string) {
@@ -94,7 +94,7 @@ func sfi(indf string, st string) {
 	var final []string
 	if len(ffound) > 1 {
 		for ; i <= (len(ffound) - 2); i++ {
-			final = union(ffound[i], ffound[i+1])
+			final = intersection(ffound[i], ffound[i+1])
 		}
 	} else {
 		final = ffound[0]
@@ -135,4 +135,32 @@ func removeDuplicates(elements []string) []string {
 	}
 	// Return the new slice.
 	return result
+}
+
+func intersection(s1, s2 []string) (inter []string) {
+	hash := make(map[string]bool)
+	for _, e := range s1 {
+		hash[e] = true
+	}
+	for _, e := range s2 {
+		// If elements present in the hashmap then append intersection list.
+		if hash[e] {
+			inter = append(inter, e)
+		}
+	}
+	//Remove dups from slice.
+	inter = removeDups(inter)
+	return
+}
+
+//Remove dups from slice.
+func removeDups(elements []string) (nodups []string) {
+	encountered := make(map[string]bool)
+	for _, element := range elements {
+		if !encountered[element] {
+			nodups = append(nodups, element)
+			encountered[element] = true
+		}
+	}
+	return
 }
