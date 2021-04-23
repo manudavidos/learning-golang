@@ -58,9 +58,7 @@ func toJson(searchlist map[string][]string) string {
 		fmt.Printf("Error: %s", err.Error())
 	}
 
-	//output := strings.ReplaceAll(string(j), "[", "{")
 	output := strings.ReplaceAll(string(j), "],", "],\n")
-	//output = strings.ReplaceAll(output, "]", "}")
 	return output
 }
 
