@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	createreverseindex("files")
+	//createreverseindex("files")
+	sfi("output.txt", "vestibulum")
 }
 
 func createreverseindex(dir string) {
@@ -38,7 +39,7 @@ func createreverseindex(dir string) {
 			ss[wl[i]] = mapitem
 		}
 	}
-	wf("output.txt", toJson(ss)[1:len(toJson(ss))-1])
+	wf("output.txt", toJson(ss))
 }
 
 func cleantext(s string) string {
@@ -57,9 +58,9 @@ func toJson(searchlist map[string][]string) string {
 		fmt.Printf("Error: %s", err.Error())
 	}
 
-	output := strings.ReplaceAll(string(j), "[", "{")
-	output = strings.ReplaceAll(output, "],", "},\n")
-	output = strings.ReplaceAll(output, "]", "}")
+	//output := strings.ReplaceAll(string(j), "[", "{")
+	output := strings.ReplaceAll(string(j), "],", "],\n")
+	//output = strings.ReplaceAll(output, "]", "}")
 	return output
 }
 
@@ -75,4 +76,65 @@ func wf(filename string, data string) error {
 		return err
 	}
 	return file.Sync()
+}
+
+func sfi(indf string, st string) {
+	content, err := ioutil.ReadFile(indf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var terms map[string][]string
+	json.Unmarshal([]byte(content), &terms)
+
+	words := strings.Split(cleantext(string(st)), " ")
+	var ffound [][]string
+	for _, word := range words {
+		ffound = append(ffound, terms[word])
+	}
+
+	i := 0
+	var final []string
+	if len(ffound) > 1 {
+		for ; i <= (len(ffound) - 2); i++ {
+			final = union(ffound[i], ffound[i+1])
+		}
+	} else {
+		final = ffound[0]
+	}
+
+	fmt.Println(removeDuplicates(final))
+}
+
+func union(a, b []string) []string {
+	m := make(map[string]bool)
+
+	for _, item := range a {
+		m[item] = true
+	}
+
+	for _, item := range b {
+		if _, ok := m[item]; !ok {
+			a = append(a, item)
+		}
+	}
+	return a
+}
+
+func removeDuplicates(elements []string) []string {
+	// Use map to record duplicates as we find them.
+	encountered := map[string]bool{}
+	result := []string{}
+
+	for v := range elements {
+		if encountered[elements[v]] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[elements[v]] = true
+			// Append to result slice.
+			result = append(result, elements[v])
+		}
+	}
+	// Return the new slice.
+	return result
 }
